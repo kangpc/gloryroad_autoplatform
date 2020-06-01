@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
-from .models import TestCaseInfo, ProjectInfo, CaseStepInfo
+from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .utils import runTestCase
 
@@ -76,6 +76,7 @@ def case_manage(request):
             case_list = paginator.page(paginator.num_pages) # 如果输入的页数不在系统的页数中，则显示最后一页
         return render(request, "case_manage.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
 
+
 # 用例步骤
 @login_required
 def casestep_manage(request):
@@ -98,9 +99,55 @@ def casestep_manage(request):
     return render(request, "casestep_manage.html", {"user": username, "testcase": testcase, "casesteps": casestep_list})
 
 
-def case_result(request):
+def case_result_level_one(request):
 
-    return render(request, "case_result.html")
+    return render(request, "case_result_level1.html")
+
+
+"""
+    execute_id = models.AutoField(primary_key=True)
+    1 case_id = models.CharField(max_length=100, null=False)
+    status = models.IntegerField(null=True, help_text="0：表示未执行，1：表示已执行")
+    1 execute_result = models.CharField(max_length=100, null=True)
+    create_time = models.DateTimeField('创建时间', auto_now_add=True)
+    1 exception_info= models.CharField(max_length=500, blank=True, null=True)
+    1 capture_screen = models.CharField(max_length=500, blank=True, null=True)
+    1 execute_start_time = models.CharField('执行开始时间', max_length=300, blank=True, null=True)
+    execute_end_time = models.CharField('执行结束时间', max_length=300, blank=True, null=True)
+
+     <td>{{ webcase.id }}</td>
+     单独<td>{{ webcase.belong_module.module_name }}</td>
+     单独<td>{{ webcase.name }}</td>
+     单独<td>{{ webcase.author }}</td>
+     单独<td>{{ webcase.create_time }}</td>
+     <td>{{ webcase.execute_time }}</td>
+     <td>{{ webcase.execute_result }}</td>
+     <td>{{ webcase.exception_info }}</td>
+     <td>{{ webcase.capture_screen }}</td>
+
+"""
+
+
+
+# 用例步骤
+@login_required
+def case_result_level_two(request):
+    username = request.session.get('user', '')
+    runStatus = request.GET.get("alreadyrun", '')
+    # runStatus: 0: 待执行，1： 已执行
+    if runStatus and (str(runStatus) == '1'):
+        print("runStatus: %s" % runStatus)
+        case_list = ExecuteRecord.objects.filter(status = 1).order_by('create_time')
+        print("case_list: ", case_list)
+        case_account = case_list.count()
+        return render(request, "case_result_level2.html",
+                      {'user': username, "cases": case_list, "caseaccounts": case_account})
+    elif runStatus and (str(runStatus) == '0'):
+        print("runStatus: %s" % runStatus)
+        case_list = ExecuteRecord.objects.filter(status = 0)
+        case_account = case_list.count()
+        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
+
 
 def login(request):
     if request.POST:

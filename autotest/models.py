@@ -95,10 +95,13 @@ class CaseStepInfo(models.Model):
 class ExecuteRecord(models.Model):
     execute_id = models.AutoField(primary_key=True)
     case_id = models.CharField(max_length=100, null=False)
-    status = models.CharField(max_length=100, null=True)
+    status = models.IntegerField(null=True, help_text="0：表示未执行，1：表示已执行")
     execute_result = models.CharField(max_length=100, null=True)
     create_time = models.DateTimeField('创建时间', auto_now_add=True)
-
+    exception_info= models.CharField(max_length=500, blank=True, null=True)
+    capture_screen = models.CharField(max_length=500, blank=True, null=True)
+    execute_start_time = models.CharField('执行开始时间', max_length=300, blank=True, null=True)
+    execute_end_time = models.CharField('执行结束时间', max_length=300, blank=True, null=True)
 
     def __str__(self):
         return self.id
@@ -112,9 +115,7 @@ class CaseExecuteResult(models.Model):
     execute_id = models.CharField(max_length=100, null=False)
     step_id = models.CharField(max_length=100, null=False)
     step_desc = models.CharField(max_length=300, null=False)
-    result = models.CharField(max_length=100, null=True)
-    capture_screen = models.CharField(max_length=500, null=False)
-    execute_time = models.DateTimeField('创建时间', auto_now_add=True)
+    result = models.CharField('执行结果',max_length=100, null=True)
 
 
     def __str__(self):

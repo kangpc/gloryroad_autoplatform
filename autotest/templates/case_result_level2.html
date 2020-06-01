@@ -122,31 +122,25 @@ function ischecked()
  <thead>
  <tr>
 
-<form action="" method="POST" style="position:absolute; top:10px; left:10px"> 
-
-<input type="checkbox" id="chElt" onclick="checkOrCancelAll();"/><span id="mySpan">全选</span> <br />
-<input name="submit" type="submit" onclick="return ischecked()" value="运行" style="position:absolute; top:0px; left:100px" />  <br />
-
-<th>选择</th><th>ID</th><th>所属模块</th><th>用例名称</th><th>负责人</th><th>创建时间</th><th>查看</th><th>编辑</th>
-
+<th>ID</th><th>所属模块</th><th>用例名称</th><th>负责人</th><th>创建时间</th><th>执行时间</th><th>执行结果</th><th>异常信息</th><th>截图信息</th>
  </tr>
  </thead>
  <tbody>
  {% for webcase in cases %}
  <tr>
- <td><input class="file" type="checkbox" name="testcase" value="{{ webcase.id }}"/></td>
- <td>{{ webcase.id }}</td>
- <td>{{ webcase.belong_module.module_name }}</td>
- <td>{{ webcase.name }}</td>
- <td>{{ webcase.author }}</td>
- <td>{{ webcase.create_time }}</td>
-<td><a href="{% url "autotest:casestep_manage" %}?webcase.id={{ webcase.id  }} "><img src="/static/admin/img/icon-yes.svg"/></a></td>
-<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Webcase" href="../admin/webtest/webcase/{{ webcase.id  }}/change/?_to_field=id&_popup=1"><img src="/static/admin/img/icon-changelink.svg"/></a></td>
- </tr>
+
+  <td>{{ webcase.execute_id }}</td>
+ <td>项目1</td>
+ <td>名称</td>
+ <td>夏晓旭</td>
+ <td>2020-06-01 00:08:40.000000</td>
+ <td></td>
+ <td></td>
+ <td></td>
+ <td></td>
+</tr>
  {% endfor %}
 
-
-</form> 
 
  </tbody>
  </table>
