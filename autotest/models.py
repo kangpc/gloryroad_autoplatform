@@ -104,7 +104,7 @@ class ExecuteRecord(models.Model):
     execute_end_time = models.CharField('执行结束时间', max_length=300, blank=True, null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.execute_id)
 
     class Meta:
         verbose_name = "运行记录表"
@@ -119,7 +119,7 @@ class CaseExecuteResult(models.Model):
 
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         verbose_name = "用例结果表"

@@ -86,6 +86,13 @@ def runTestCase(case_id_list):
         print("################执行用例名################： %s" % caseName)
         print("stepStep: %s" % stepDict["stepStep"])
         print("testDescription: %s" % stepDict["testDescription"])
+
+        # 插入用例执行记录表（executerecord）: case_id、status、create_time
+        execute_record = ExecuteRecord()
+        execute_record.case_id = caseId
+        execute_record.status = 0 # 初始状态为待执行
+        execute_record.save() # 保存执行记录表
+        # 更新用例执行结果(executerecord)
         optionKeyWord = stepDict["optionMethod"]
         findmethod = stepDict["findmethod"]
         locator = stepDict["locator"]
@@ -94,6 +101,8 @@ def runTestCase(case_id_list):
         print("findmethod: %s" % findmethod)
         print("element: %s" % locator)
         print("testData: %s" % testData)
+
+        # 执行时，更新用例结果表的执行开始时间（execute_start_time）、执行结束后，更新执行结束时间(execute_end_time)以及执行结果(status、execute_result、capture_screen)
         if runStep(optionKeyWord, findmethod, locator,testData):
             resultDict[caseId] = 'pass'
         else:

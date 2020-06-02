@@ -71,50 +71,6 @@
 </div>
 
 
-<script type="text/javascript">
-//页面加载的时候,所有的复选框都是未选中的状态
-function checkOrCancelAll()
-{
-    var chElt=document.getElementById("chElt");//1.获取checkbo的元素对象    
-    var checkedElt = chElt.checked;//2.获取选中状态
-    var allCheck = document.getElementsByClassName("file");//3.若checked=true,将所有的复选框选中,checked=false,将所有的复选框取消
-
-    //var allCheck = document.getElementsByName("file");//方法2
-    var mySpan=document.getElementById("mySpan");//4.循环遍历取出每一个复选框中的元素
-    if(checkedElt)//全选
-    {
-        
-        for(var i=0;i<allCheck.length;i++)
-        {
-            //设置复选框的选中状态
-            allCheck[i].checked=true;
-        }
-        mySpan.innerHTML="取消全选";
-    }
-    else//取消全选
-    {
-        for(var i=0;i<allCheck.length;i++)
-        {
-            allCheck[i].checked=false;
-        }
-        mySpan.innerHTML="全选";
-    }
-}
-function ischecked()
-{
-    var allCheck = document.getElementsByClassName("file");//3.若checked=true,将所有的复选框选中,checked=false,将所有的复选框取消
-    for(var i=0;i<allCheck.length;i++)
-    {
-        if(allCheck[i].checked == true)
-        {
-            return true
-        }
-    }
-    alert("请选择文件")
-    return false
-}
-</script>
-
  <!-- web测试用例列表-->
  <div class="row" style="padding-top: 20px;">
  <div class="col-md-12">
@@ -128,19 +84,16 @@ function ischecked()
  <tbody>
  {% for webcase in cases %}
  <tr>
-
-  <td>{{ webcase.execute_id }}</td>
- <td>项目1</td>
- <td>名称</td>
- <td>夏晓旭</td>
- <td>2020-06-01 00:08:40.000000</td>
- <td></td>
- <td></td>
- <td></td>
- <td></td>
-</tr>
+ <td>{{ webcase.id }}</td>
+ <td>{{ webcase.belong_module }}</td>
+ <td>{{ webcase.name }}</td>
+ <td>{{ webcase.author }}</td>
+ <td>{{ webcase.create_time }}</td>
+ <td>{{ webcase.execute_time }}</td>
+ <td>{{ webcase.execute_result }}</td>
+ <td>{{ webcase.exception_info }}</td>
+ <td>{{ webcase.capture_screen }}</td>
  {% endfor %}
-
 
  </tbody>
  </table>

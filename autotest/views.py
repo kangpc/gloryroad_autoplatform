@@ -39,6 +39,7 @@ def caseSearch(request):
 #             print("no case_id_list")
 #             return HttpResponse("fail")
 
+
 @login_required
 def caseStepSearch(request):
     username = request.session.get('user','') # 读取session
@@ -124,28 +125,36 @@ def case_result_level_one(request):
      <td>{{ webcase.execute_result }}</td>
      <td>{{ webcase.exception_info }}</td>
      <td>{{ webcase.capture_screen }}</td>
-
 """
-
-
-
 # 用例步骤
 @login_required
 def case_result_level_two(request):
     username = request.session.get('user', '')
     runStatus = request.GET.get("alreadyrun", '')
     # runStatus: 0: 待执行，1： 已执行
-    if runStatus and (str(runStatus) == '1'):
+    if runStatus:
         print("runStatus: %s" % runStatus)
-        case_list = ExecuteRecord.objects.filter(status = 1).order_by('create_time')
-        print("case_list: ", case_list)
-        case_account = case_list.count()
-        return render(request, "case_result_level2.html",
-                      {'user': username, "cases": case_list, "caseaccounts": case_account})
-    elif runStatus and (str(runStatus) == '0'):
-        print("runStatus: %s" % runStatus)
-        case_list = ExecuteRecord.objects.filter(status = 0)
-        case_account = case_list.count()
+        case_recored_list = ExecuteRecord.objects.filter(status = 1).order_by('create_time') if (str(runStatus) == '1') else ExecuteRecord.objects.filter(status=0)
+        print("case_recored_list: ", case_recored_list)
+        case_list = []
+        for record in case_recored_list:
+            case_dict = {}
+            case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
+            print("case_info: ,", case_info)
+            case_dict["case_id"] = record.case_id
+            case_dict["execute_result"] = '' if not record.execute_result else record.execute_result
+            case_dict["exception_info"] = '' if  not record.exception_info else record.exception_info
+            case_dict["capture_screen"] = '' if not record.capture_screen else record.capture_screen
+            case_dict["execute_start_time"] = record.execute_start_time
+            case_dict["belong_module"] = case_info.belong_module.module_name
+            case_dict["name"] = case_info.name
+            case_dict["author"] = case_info.author
+            case_dict["create_time"] = case_info.create_time
+            print("case_dict: %s" % case_dict)
+            case_list.append(case_dict)
+
+        print("case_list: %s" % case_list)
+        case_account = len(case_list)
         return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
 
 
