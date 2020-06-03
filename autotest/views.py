@@ -56,7 +56,7 @@ def case_manage(request):
         if case_id_list:
             print("case_id_list: ", case_id_list)
             # 获取测试用例
-            resultDict = runTestCase(case_id_list)
+            runTestCase(case_id_list)
 
             return HttpResponse("ok")
         else:

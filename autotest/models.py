@@ -115,7 +115,8 @@ class CaseExecuteResult(models.Model):
     execute_id = models.CharField(max_length=100, null=False)
     step_id = models.CharField(max_length=100, null=False)
     step_desc = models.CharField(max_length=300, null=False)
-    result = models.CharField('执行结果',max_length=100, null=True)
+    result = models.CharField('执行结果',max_length=100, blank=True, null=True)
+    create_time = models.DateTimeField('创建时间', auto_now=True)  # 创建时间-自动获取当前时间
 
 
     def __str__(self):
