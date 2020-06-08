@@ -18,36 +18,36 @@ def getBaiDu():
     time.sleep(20)
     browser.close()
 
-
 # 获取测试用例
 def runTestCase(case_id_list):
     print("case_id_list: %s" % case_id_list)
-    #case_list = []
+    # case_list = []
     # [{"caseId":1, "testStep": 1, "testDescription":"打开谷歌浏览器"， "optionMethod": "open_browser","findmethod": "xpath", "element": None, "testData": ""chrome}],
     # caseid}
-    #case_step_list = []
-    execute_id_list = []
+    # case_step_list = []
+    # execute_id_list = []
     for caseId in case_id_list:
         try:
             # 存储用例执行记录表（executerecord）
             print("#################保存执行表#################")
             execute_record = ExecuteRecord()
             execute_record.case_id = caseId
-            execute_record.status = 0 # 未执行
-            execute_record.save() # 一条数据保存一次
-            execute_id_list.append(execute_record.execute_id)
-            caseSteps = CaseStepInfo.objects.filter(case_id = int(caseId)).order_by("teststep")
+            execute_record.status = 0  # 未执行
+            execute_record.save()  # 一条数据保存一次
+            # execute_id_list.append(execute_record.execute_id)
+            caseSteps = CaseStepInfo.objects.filter(case_id=int(caseId)).order_by("teststep")
             print("caseSteps: ", caseSteps)
             case_result = {}  # 结果字典{"step1": "pass", "step2": "fail"}
 
             # 执行用例的每一个步骤
             for caseStep in caseSteps:
+                print("$$$$$$caseStep %s: %s" % (caseStep.teststep, caseStep))
                 # 存CaseExecuteResult表
                 case_execute_result = CaseExecuteResult()
                 case_execute_result.execute_id = execute_record.execute_id
                 case_execute_result.step_id = caseStep.teststep
                 case_execute_result.step_desc = caseStep.testobjname
-                case_execute_result.save() # 保存表
+                case_execute_result.save()  # 保存表
                 try:
                     # 执行用例
                     # 执行时，更新执行记录表（ExecuteRecord）,执行结束后，更新执行结束时间(execute_end_time)以及执行结果(status、execute_result、capture_screen)
@@ -60,35 +60,55 @@ def runTestCase(case_id_list):
                     print("element: %s" % locator)
                     print("testData: %s" % testData)
                     execute_command = getExecuteCommand(optionKeyWord, findmethod, locator, testData)
-                    if int(caseStep.teststep) == 1: # 执行到第一步，写入执行开始时间
+                    if "open_browser" in execute_command:
+                        execute_command = '%s("%s")' % (optionKeyWord, testData)
+                        print("execute_command:%s" % execute_command)
+                        try:
+                            driver = eval(execute_command)
+                        except Exception as e:
+                            print("command 执行出错： %s" % e)
+                    else:
+                        print("execute_command:%s" % execute_command)
+                        try:
+                            eval(execute_command)
+                        except Exception as e:
+                            print("command 执行出错： %s" % e)
+
+                    if int(caseStep.teststep) == 1:  # 执行到第一步，写入执行开始时间
                         print("第一条步骤，写入执行开始时间")
                         execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
-                    eval(execute_command)
                     case_result[caseStep.teststep] = 'pass'
                     case_execute_result.result = "pass"
-                    print("case_result: %s" % case_result)
-                    case_execute_result.save()  # 存结果表
+                    print("case_result1: %s" % case_result)
+                    try:
+                        case_execute_result.save()  # 存结果表
+                    except Exception as e:
+                        print("结果表保存出错： %s" % e)
+
                 except Exception as e:
                     print("步骤执行错误： %s" % e)
                     capture_screen_path = captureScreen()
                     execute_record.exception_info = e
                     case_result[caseStep.teststep] = 'fail'
-                    print("case_result: %s" % case_result)
+                    print("case_result1: %s" % case_result)
                     case_execute_result.result = "fail"
-                    case_execute_result.save() # 存结果表
-                    break # 跳出当前用例的执行
 
+                    try:
+                        case_execute_result.save()  # 存结果表
+                    except Exception as e:
+                        print("结果表保存出错： %s" % e)
+                    break  # 跳出当前用例的执行
 
             print("case_result: %s" % case_result)
             # 如果用例的步骤都是通过的，则用例执行结果为pass
-            if (len(set(case_result.values())) == 1) and (list(set(case_result.values()))[0]== 'pass'):
+            if (len(set(case_result.values())) == 1) and (list(set(case_result.values()))[0] == 'pass'):
                 print("用例执行结果成功！")
                 execute_record.execute_result = 'pass'
             else:
                 execute_record.execute_result = 'fail'
                 print("用例执行结果失败！")
             execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
-            execute_record.status = 1 # 更新用例执行状态为已执行
+            execute_record.status = 1  # 更新用例执行状态为已执行
 
             try:
                 # 保存
@@ -97,11 +117,10 @@ def runTestCase(case_id_list):
                 print("执行结果表保存结果失败: %s" % e)
 
         except Exception as e:
-            print("error occurs: %s" % e)
-    print("execute_id_list: %s" % execute_id_list)
-    return execute_id_list
-
-
+            print("用例执行出错，信息为： %s" % e)
+    # print("execute_id_list: %s" % execute_id_list)
+    # return execute_id_list
+    print("&&&&&用例执行完毕！")
 
     #print("case_step_list: %s" % case_step_list)
     #return case_step_list
@@ -112,18 +131,18 @@ def getExecuteCommand(optionKeyWord, findmethod=None, locator=None, testData=Non
 
     if findmethod:
         if locator and testData:
-            command = '%s("%s", "%s", "%s")'% (optionKeyWord, findmethod, locator,testData)
+            command = '%s( "%s", "%s", "%s", driver=driver)'% (optionKeyWord, findmethod, locator,testData)
         elif locator and not testData:
-            command = '%s("%s", "%s")' % (optionKeyWord, findmethod, locator)
+            command = '%s("%s", "%s", driver=driver)' % (optionKeyWord, findmethod, locator)
 
         elif not locator and testData:
-            command = '%s("%s", "%s")' % (optionKeyWord, findmethod, testData)
+            command = '%s("%s", "%s", driver=driver)' % (optionKeyWord, findmethod, testData)
     elif testData:
-        command = '%s("%s")' % (optionKeyWord, testData)
+        command = '%s("%s", driver=driver)' % (optionKeyWord, testData)
     else:
-        command = "%s()" % (optionKeyWord)
+        command = "%s(driver=driver)" % (optionKeyWord)
 
-    print("command: ", command)
+    print("command: %s" % command)
     return command
 
 

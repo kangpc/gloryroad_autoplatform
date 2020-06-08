@@ -1,6 +1,6 @@
 #encoding=utf-8
-import pymysql
-pymysql.install_as_MySQLdb()
-
+# import pymysql
+# # pymysql.install_as_MySQLdb()
+# #
 from .celery import app as celery_app
 __all__ = ['celery_app']

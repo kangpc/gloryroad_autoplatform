@@ -35,17 +35,29 @@ from selenium.webdriver.support.wait import WebDriverWait
 # # browser.close()
 
 
+# global_values = {}
 
-
-driver = ""
+#driver = ""
 
 def is_xpath(exp):
     if ("//" in exp) or ("[" in exp) or ("@" in exp):
         return True
     return False
 
+def open_browser(browser_name):
+    print("!!!! going into open_browser")
+    if "ie" in browser_name.lower():
+        driver  = webdriver.Ie(executable_path="e:\\IEDriverServer")
+    elif "chrome" in browser_name.lower():
+        driver  = webdriver.Chrome(executable_path="D:\\chromedriver")
+    else:
+        driver = webdriver.Firefox(executable_path="e:\\geckodriver")
 
-def find_element(locate_method,locate_exp):
+    return driver
+
+
+def find_element(driver, locate_method,locate_exp):
+
     try:
         element = WebDriverWait(driver, 10).until \
         (lambda x: x.find_element(locate_method,locate_exp))
@@ -68,34 +80,28 @@ def find_element(locate_method,locate_exp):
 #         driver, element_locator.split(">")[0], element_locator.split(">")[1])
 #     return element
 
-def open_browser(browser_name):
-    print("!!!! going into open_browser")
-    global driver
-    if "ie" in browser_name.lower():
-        driver  = webdriver.Ie(executable_path="e:\\IEDriverServer")
-    elif "chrome" in browser_name.lower():
-        driver  = webdriver.Chrome(executable_path="D:\\chromedriver")
-    else:
-        driver = webdriver.Firefox(executable_path="e:\\geckodriver")
-    return driver
 
-def visit(url):
-    global driver
 
+
+def visit(url, driver=None):
+    print("driver: %s" % driver)
     driver.get(url)
 
-def input(locate_method,locate_exp,content):
-    global  driver
+
+
+def input(locate_method,locate_exp,content, driver=None):
+    print("driver: %s" % driver)
     print("locate_exp: %s" % locate_exp)
     if is_xpath(locate_exp):
         element = driver.find_element_by_xpath(locate_exp)
         element.send_keys(content)
     else:
-        element = find_element(locate_method,locate_exp)
+        element = find_element(driver, locate_method,locate_exp)
         element.send_keys(content)
 
-def click(locate_method,locate_exp):
-    global  driver
+
+def click(locate_method,locate_exp, driver=None):
+    print("driver: %s" % driver)
     if is_xpath(locate_exp):
         element = driver.find_element_by_xpath(locate_exp)
         element.click()
@@ -103,25 +109,29 @@ def click(locate_method,locate_exp):
         element = find_element(locate_method,locate_exp)
         element.click()
 
+
 def sleep(seconds):
     time.sleep(float(seconds))
 
-def assert_word(expected_word):
-    global  driver
+def assert_word(expected_word, driver=None):
+    print("driver: %s" % driver)
     assert expected_word in driver.page_source
 
-def switch_to(locate_method,locate_exp):
-    global driver
+def switch_to(locate_method,locate_exp, driver=None):
+    print("driver: %s" % driver)
     if is_xpath(locate_exp):
         driver.switch_to.frame(driver.find_element_by_xpath(locate_exp))
     else:
         element = find_element(locate_method,locate_exp)
         driver.switch_to.frame(element)
 
-def switch_back():
-    global driver
+def switch_back(driver=None):
+    print("driver: %s" % driver)
     driver.switch_to.default_content()
 
-def quit():
-    global  driver
+def quit(driver=None):
+    print("driver: %s" % driver)
     driver.quit()
+
+
+# open_browser("chrome")

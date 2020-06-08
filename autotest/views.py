@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .utils import runTestCase
+# from .utils import runTestCase
+from .tasks import runTestCase
 
 # Create your views here.
 
@@ -56,7 +57,8 @@ def case_manage(request):
         if case_id_list:
             print("case_id_list: ", case_id_list)
             # 获取测试用例
-            runTestCase(case_id_list)
+            # runTestCase.delay(case_id_list)
+            runTestCase.delay(case_id_list)
 
             return HttpResponse("ok")
         else:
