@@ -191,8 +191,31 @@ def getExecuteCommand(optionKeyWord, findmethod=None, locator=None, testData=Non
 #     #browser.close()
 
 
-def captureScreen(driver,screenName):
-    picturePath = os.path.join(projectPath, screenRelativePath, screenName) + '.png'
+
+def captureScreen(driver, screenName):
+
+    '''获取日期，如"2020-06-10,判断固定格式的日期是否存在，如"2019年\06月\10日"是否存在，如果不存在，新建一个，获取该路径，如果存在，则取该路径
+        文件名格式：年月日时分秒+执行id+步骤id+".png"，如20200610224637-127-6.png
+    '''
+
+    print("projectPath: %s" %projectPath)
+    print("screenRelativePath: %s" % screenRelativePath)
+
+    year, month, day = time.strftime("%Y-%m-%d").split("-")
+    print(year, month,day)
+    relativeDatePath = os.path.join("%s年"%year,"%s月"%month,"%s日"%day)
+    print("relativeDatePath: %s" % relativeDatePath)
+    absoluteDatePath = os.path.join(projectPath, screenRelativePath, relativeDatePath)
+    print("datePath: %s" % absoluteDatePath)
+    print("os.path.exists(absoluteDatePath): %s" % os.path.exists(absoluteDatePath))
+    if not os.path.exists(absoluteDatePath):
+        os.makedirs(absoluteDatePath)
+        print("os.path.exists(datePath): %s" % os.path.exists(absoluteDatePath))
+    # # os.makedirs()
+    # browser = webdriver.Chrome(r"D:\\chromedriver")
+    # browser.set_window_size(1200, 900)
+    # browser.get("http://mail.126.com")  # Load page
+    picturePath = os.path.join(absoluteDatePath, screenName) + '.png'
     print("picturePath: %s" % picturePath)
 
     try:
@@ -202,7 +225,9 @@ def captureScreen(driver,screenName):
         print("total time: %s" %(et - st))
     except Exception  as e:
         print("error occurs: %s" % e)
-    return os.path.join(screenRelativePath, screenName ) + '.png'
+    relativeScreenPath = os.path.join(screenRelativePath, relativeDatePath, screenName ) + '.png'
+    print("relativePath: %s" % relativeScreenPath)
+    return relativeScreenPath
 
 
 # 获取测试用例

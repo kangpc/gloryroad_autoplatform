@@ -97,7 +97,7 @@ def runTestCase(case_id_list):
                             eval(execute_command)
                     except Exception as e:
                         print("command 执行出错： %s" % e)
-                        file_name = str(case_execute_result.execute_id) + "-" + str(case_execute_result.step_id)
+                        file_name = time.strftime("%Y%m%d%H%M%S") + str(case_execute_result.execute_id) + "-" + str(case_execute_result.step_id)
                         capture_screen_path = captureScreen(driver, file_name)
 
                         execute_record.exception_info = e

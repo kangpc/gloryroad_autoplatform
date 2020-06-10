@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 import os
 from concurrent.futures import ThreadPoolExecutor
 from django.contrib import auth
-from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord
+from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord, ModuleInfo
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # from .utils import runTestCase
 from .tasks import runTestCase
