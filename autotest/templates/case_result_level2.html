@@ -91,8 +91,18 @@
  <td>{{ webcase.create_time }}</td>
  <td>{{ webcase.execute_time }}</td>
  <td>{{ webcase.execute_result }}</td>
- <td>{{ webcase.exception_info }}</td>
- <td>{{ webcase.capture_screen }}</td>
+{% if webcase.exception_info == "" %}
+      <td>无</td>
+{% else %}
+     <td><a href="/exception_info/?exceptionInfo={{ webcase.exception_info }}" target="_blank">异常信息</a></td>
+{% endif %}
+
+{% if webcase.capture_screen == "" %}
+      <td>无</td>
+{% else %}
+     <td><a href="{{ webcase.capture_screen }}" target="_blank">异常截图</a></td>
+{% endif %}
+ </tr>
  {% endfor %}
 
  </tbody>

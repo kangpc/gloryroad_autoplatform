@@ -63,7 +63,7 @@ def runTestCase(case_id_list):
 
             # 执行用例的每一个步骤
             for caseStep in caseSteps:
-                print("$$$$$$caseStep %s: %s" % (caseStep.teststep, caseStep))
+                print("$$$$$$caseStep %s: %s" % (caseStep.teststep, caseStep.testobjname))
                 # 存CaseExecuteResult表
                 case_execute_result = CaseExecuteResult()
                 case_execute_result.execute_id = execute_record.execute_id
@@ -81,24 +81,38 @@ def runTestCase(case_id_list):
                     print("findmethod: %s" % findmethod)
                     print("element: %s" % locator)
                     print("testData: %s" % testData)
+                    # 获取执行命令
                     execute_command = getExecuteCommand(optionKeyWord, findmethod, locator, testData)
-                    if "open_browser" in execute_command:
-                        execute_command = '%s("%s")' % (optionKeyWord, testData)
-                        print("execute_command:%s" % execute_command)
-                        try:
-                            driver= eval(execute_command)
-                        except Exception as e:
-                            print("command 执行出错： %s" % e)
-                    else:
-                        print("execute_command:%s" % execute_command)
-                        try:
-                            eval(execute_command)
-                        except Exception as e:
-                            print("command 执行出错： %s" % e)
 
                     if int(caseStep.teststep) == 1: # 执行到第一步，写入执行开始时间
                         print("第一条步骤，写入执行开始时间")
                         execute_record.execute_start_time = time.strftime("%Y-%m-%d %H:%M:%S")
+
+                    # 执行用例
+                    try:
+                        if "open_browser" in execute_command:
+                            execute_command = '%s("%s")' % (optionKeyWord, testData)
+                            driver = eval(execute_command)
+                        else:
+                            eval(execute_command)
+                    except Exception as e:
+                        print("command 执行出错： %s" % e)
+                        file_name = str(case_execute_result.execute_id) + "-" + str(case_execute_result.step_id)
+                        capture_screen_path = captureScreen(driver, file_name)
+
+                        execute_record.exception_info = e
+                        execute_record.capture_screen = capture_screen_path
+                        case_result[caseStep.teststep] = 'fail'
+                        print("case_result1: %s" % case_result)
+                        case_execute_result.result = "fail"
+
+                        try:
+                            case_execute_result.save()  # 存结果表
+                        except Exception as e:
+                            print("结果表保存出错： %s" % e)
+                        break  # 跳出当前用例的执行
+
+
                     case_result[caseStep.teststep] = 'pass'
                     case_execute_result.result = "pass"
                     print("case_result1: %s" % case_result)
@@ -107,10 +121,14 @@ def runTestCase(case_id_list):
                     except Exception as e:
                         print("结果表保存出错： %s" % e)
 
+
                 except Exception as e:
                     print("步骤执行错误： %s" % e)
-                    capture_screen_path = captureScreen()
+                    file_name = str(case_execute_result.execute_id) + "-"+str(case_execute_result.step_id)
+                    capture_screen_path = captureScreen(driver, file_name)
+
                     execute_record.exception_info = e
+                    execute_record.capture_screen = capture_screen_path
                     case_result[caseStep.teststep] = 'fail'
                     print("case_result1: %s" % case_result)
                     case_execute_result.result = "fail"
@@ -121,15 +139,15 @@ def runTestCase(case_id_list):
                         print("结果表保存出错： %s" % e)
                     break # 跳出当前用例的执行
 
-
             print("case_result: %s" % case_result)
+
             # 如果用例的步骤都是通过的，则用例执行结果为pass
             if (len(set(case_result.values())) == 1) and (list(set(case_result.values()))[0]== 'pass'):
                 print("用例执行结果成功！")
                 execute_record.execute_result = 'pass'
             else:
                 execute_record.execute_result = 'fail'
-                print("用例执行结果失败！")
+                print("用例(case_id:%s) 执行结果失败！"% execute_record.case_id)
             execute_record.execute_end_time = time.strftime("%Y-%m-%d %H:%M:%S")
             execute_record.status = 1 # 更新用例执行状态为已执行
 

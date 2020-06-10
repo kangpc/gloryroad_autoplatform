@@ -47,9 +47,13 @@ def is_xpath(exp):
 def open_browser(browser_name):
     print("!!!! going into open_browser")
     if "ie" in browser_name.lower():
+
         driver  = webdriver.Ie(executable_path="e:\\IEDriverServer")
     elif "chrome" in browser_name.lower():
-        driver  = webdriver.Chrome(executable_path="D:\\chromedriver")
+        options = webdriver.ChromeOptions()
+        options.add_argument('--ignore-certificate-errors-spki-list')
+        options.add_argument('--ignore-ssl-errors')
+        driver  = webdriver.Chrome(executable_path="D:\\chromedriver",chrome_options=options)
     else:
         driver = webdriver.Firefox(executable_path="e:\\geckodriver")
 

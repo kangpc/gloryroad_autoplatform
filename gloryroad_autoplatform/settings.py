@@ -150,3 +150,4 @@ LOGIN_URL = '/login/'
 # 设置媒体资源的保存路径
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

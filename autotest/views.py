@@ -3,11 +3,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+import os
+from concurrent.futures import ThreadPoolExecutor
 from django.contrib import auth
 from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # from .utils import runTestCase
 from .tasks import runTestCase
+from .config import projectPath, screenRelativePath
 
 # Create your views here.
 
@@ -57,8 +60,11 @@ def case_manage(request):
         if case_id_list:
             print("case_id_list: ", case_id_list)
             # 获取测试用例
-            # runTestCase.delay(case_id_list)
             runTestCase.delay(case_id_list)
+            # with ThreadPoolExecutor(3) as executor:
+            #     executor.map(runTestCase, case_id_list)
+
+            # runTestCase(case_id_list)
 
             return HttpResponse("ok")
         else:
@@ -159,6 +165,9 @@ def case_result_level_two(request):
         case_account = len(case_list)
         return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
 
+def exception_info(request):
+    exception_info = request.GET.get("exceptionInfo", '')
+    return render(request, "exception_info.html", {"exceptionInfo": exception_info})
 
 def login(request):
     if request.POST:
