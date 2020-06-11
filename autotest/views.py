@@ -171,6 +171,18 @@ def exception_info(request):
     print("exception_info: %s" % exception_info)
     return render(request, "exception_info.html", {"exceptionInfo": exception_info})
 
+def project_level_report(request):
+
+    return render(request, "project_level_report.html")
+
+def autotest_report(request):
+
+    return render(request, "autotest_report.html")
+
+def case_level_report(request):
+
+    return render(request, "case_level_report.html")
+
 def login(request):
     if request.POST:
         username = request.POST.get('username', '')
