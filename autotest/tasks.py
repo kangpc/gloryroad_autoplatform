@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
+import traceback
 from celery import shared_task
 import time
 from .models import *
@@ -96,11 +96,12 @@ def runTestCase(case_id_list):
                         else:
                             eval(execute_command)
                     except Exception as e:
-                        print("command 执行出错： %s" % e)
+                        error_msg = traceback.format_exc()
+                        print("command 执行出错： %s" % error_msg)
                         file_name = time.strftime("%Y%m%d%H%M%S") + str(case_execute_result.execute_id) + "-" + str(case_execute_result.step_id)
                         capture_screen_path = captureScreen(driver, file_name)
 
-                        execute_record.exception_info = e
+                        execute_record.exception_info = error_msg
                         execute_record.capture_screen = capture_screen_path
                         case_result[caseStep.teststep] = 'fail'
                         print("case_result1: %s" % case_result)
@@ -123,11 +124,12 @@ def runTestCase(case_id_list):
 
 
                 except Exception as e:
-                    print("步骤执行错误： %s" % e)
+                    error_msg = traceback.format_exc()
+                    print("步骤执行错误： %s" % error_msg)
                     file_name = str(case_execute_result.execute_id) + "-"+str(case_execute_result.step_id)
                     capture_screen_path = captureScreen(driver, file_name)
 
-                    execute_record.exception_info = e
+                    execute_record.exception_info = error_msg
                     execute_record.capture_screen = capture_screen_path
                     case_result[caseStep.teststep] = 'fail'
                     print("case_result1: %s" % case_result)

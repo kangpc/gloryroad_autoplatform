@@ -166,7 +166,9 @@ def case_result_level_two(request):
         return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
 
 def exception_info(request):
+    print("request.POST: %s" % request.POST)
     exception_info = request.GET.get("exceptionInfo", '')
+    print("exception_info: %s" % exception_info)
     return render(request, "exception_info.html", {"exceptionInfo": exception_info})
 
 def login(request):

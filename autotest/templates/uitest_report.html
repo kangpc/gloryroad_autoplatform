@@ -1,0 +1,76 @@
+<html lang="zh-CN">
+<head>
+{% load static %}
+<title>光荣之路测试平台</title>
+<link href="../static/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+<script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.js"></script>
+<script type="text/javascript" src="/static/admin/js/urlify.js"></script>
+<script type="text/javascript" src="/static/admin/js/prepopulate.js"></script>
+<script type="text/javascript" src="/static/admin/js/vendor/xregexp/xregexp.js"></script>
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" type="text/css" href="/static/admin/css/responsive.css" />
+<meta name="robots" content="NONE,NOARCHIVE" />
+</head>
+<body role="document">
+<!-- 导航栏-->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+<div class="container">
+<ul class="nav justify-content-left"> &nbsp;
+</ul>
+<ul class="nav justify-content-center"> &nbsp;
+</ul>
+<ul class="nav justify-content-end" style="position:absolute; right:10px; bottom:0px; ">
+<li class="nav-link"><a style='color:white' href="#">{{user}}</a></li>
+<li class="nav-link"><a style='color:white' href="/logout/">退出</a></li>
+</ul>
+</div>
+</nav>
+
+
+{% csrf_token %}
+
+
+<div class="row" style="padding-top: 30px;">
+<div class="col-md-12">
+<table class="table table-striped">
+<thead>
+
+<tr>
+<th>测试报告</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+
+<td><a style='color:light blue; target-new: tab;'  target="_blank" class="related-widget-wrapper-link add-related" id="add_id_Product" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=1" >已执行用例</a></td>
+
+</tr>
+<tr>
+
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Product" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=0">未执行用例</a></td>
+
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<!--统计和翻页功能-->
+<span style="position:absolute; left:600px; bottom:30px;">   {# 把翻页功能固定显示在右下角#}
+<div style="position:absolute; right:950px; bottom:25px; width:100px;">
+{# 共:{{ productcounts }}条记录 {# 前端读取定义的变量#} #}
+</div>
+<div class="container" >
+
+
+</div>
+</body>
+</html>
