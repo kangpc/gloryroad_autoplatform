@@ -7,7 +7,7 @@ import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from django.contrib import auth
-from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord, ModuleInfo
+from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord, ModuleInfo, TestSuiteInfo
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # from .utils import runTestCase
 from .tasks import runTestCase
@@ -111,6 +111,79 @@ def casestep_manage(request):
         casestep_list = paginator.page(paginator.num_pages)  # 如果输入的页数不在系统的页数中，则显示最后一页
 
     return render(request, "casestep_manage.html", {"user": username, "testcase": testcase, "casesteps": casestep_list})
+
+
+
+# 用例步骤
+@login_required
+def suite_manage(request):
+    if request.method == "POST":
+        username = request.session.get('user', '')
+        print("username: %s" % username)
+        suite_id_list = request.POST.getlist('testsuite')
+        if suite_id_list:
+            print("case_id_list: ", suite_id_list)
+            # 获取当前时间点时间戳，用于存储各个用例执行记录的执行id（相同）
+            execute_id = int(time.time())
+            print("execute_id: %s" % execute_id)
+            case_id_list = []
+            for suite_id in suite_id_list:
+                suiteInfo = TestSuiteInfo.objects.filter(id=suite_id).first()
+                include_cases = suiteInfo.include_cases
+                print("include_cases: %s" % include_cases)
+                include_cases = eval(include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+                print("include_cases: %s" % include_cases)
+                for case in include_cases:
+                    case_id_list.append(case[0])
+                print("case_id_list: %s" % case_id_list)
+            for caseId in case_id_list:
+                # 获取测试用例
+                runTestCase.delay(execute_id, caseId, username)
+                # with ThreadPoolExecutor(3) as executor:
+                #     executor.map(runTestCase, case_id_list)
+            return HttpResponse("ok")
+        else:
+            print("no case_id_list")
+            return HttpResponse("fail")
+    else:
+
+        username = request.session.get('user', '')
+        testsuite_data = TestSuiteInfo.objects.all()
+        suite_list = []
+        for suite in testsuite_data:
+            suite_dict = {}
+            suite_dict['id'] = suite.id
+            suite_dict['suite_name'] = suite.suite_name
+            print("suite.include_cases: %s" % suite.include_cases)
+            include_cases = eval(suite.include_cases) # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+            print("include_cases: %s" % include_cases)
+            include_cases_list = []
+            for case in include_cases:
+                include_cases_dict = {}
+                include_cases_dict['case_id'] =  case[0]
+                include_cases_dict['case_desc'] =  case[1]
+                include_cases_list.append(include_cases_dict)
+            print("include_cases_list: %s" % include_cases_list)
+
+            suite_dict['include_cases'] = include_cases_list
+            suite_dict['create_time'] = suite.create_time
+            suite_dict['update_time'] = suite.update_time
+            suite_list.append(suite_dict)
+        print("suite_list: %s" % suite_list)
+
+        paginator = Paginator(suite_list, 8) # 生成paginator对象，设置每页显示8条记录
+        page = request.GET.get('page', 1) # 获取当前的页码数，默认为第一页
+        currentPage = int(page) # 把获取的当前页码数转成整数类型
+
+        try:
+            casestep_list = paginator.page(currentPage)  # 获取当前页数的记录列表
+        except PageNotAnInteger:
+            casestep_list = paginator.page(1)  # 如果输入的页数不是整数，则显示第一页内容
+        except EmptyPage:
+            casestep_list = paginator.page(paginator.num_pages)  # 如果输入的页数不在系统的页数中，则显示最后一页
+
+        return render(request, "suite_manage.html", {"user": username, "testsuites": testsuite_data})
+
 
 
 def case_result_level_one(request):
