@@ -170,6 +170,39 @@ def case_result_level_two(request):
         case_account = len(case_list)
         return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
 
+# 用例步骤
+@login_required
+def case_result_detail(request):
+    username = request.session.get('user', '')
+    caseId = request.GET.get("caseid", '')
+    if caseId:
+        print("caseId: %s" % caseId)
+        # 先找到executerecord表中该用例id的最新执行主键id，然后通过该主键id到caseexeuteresult中找execute_record_id为该主键id的记录
+        case_record_data = ExecuteRecord.objects.filter(case_id = caseId)
+        print("case_record_data: %s" % case_record_data)
+        case_record_id = max([record.id for record in ExecuteRecord.objects.filter(case_id = caseId)])
+        print("case_record_id: %s" % case_record_id)
+        case_execute_result_list = CaseExecuteResult.objects.filter(execute_record_id = case_record_id).order_by('step_id')
+        print("case_execute_result_list: %s" % case_execute_result_list)
+        caseStepResultList = []
+        for stepResult in case_execute_result_list:
+            step_result_dict = {}
+            step_result_dict["step_id"] = stepResult.step_id
+            step_result_dict["step_desc"] = stepResult.step_desc
+            step_result_dict["step_result"] = stepResult.result
+            step_result_dict["create_time"] = stepResult.create_time
+            step_result_dict["exception_info"] = '' if not stepResult.exception_info else stepResult.exception_info
+            step_result_dict["capture_screen"] = '' if not stepResult.capture_screen else stepResult.capture_screen
+
+            print("step_result_dict: %s" % step_result_dict)
+            caseStepResultList.append(step_result_dict)
+
+        print("caseStepResultList: %s" % caseStepResultList)
+        case_account = len(caseStepResultList)
+        return render(request, "case_result_detail.html", {'user': username, "casesteps": caseStepResultList, "caseaccounts": case_account})
+
+
+
 def exception_info(request):
     print("request.POST: %s" % request.POST)
     exception_info = request.GET.get("exceptionInfo", '')

@@ -15,6 +15,7 @@ urlpatterns = [
     path('casestep_manage/', casestep_manage, name='casestep_manage'),
     path('case_result_level_one/', case_result_level_one, name='case_result_level_one'),
     path('case_result_level_two/', case_result_level_two, name='case_result_level_two'),
+    path('case_result_detail/', case_result_detail, name='case_result_detail'),
     path('exception_info/', exception_info, name='exception_info'),
     path('autotest_report/', autotest_report, name='autotest_report'),
     path('project_level_report/', project_level_report, name='project_level_report'),
