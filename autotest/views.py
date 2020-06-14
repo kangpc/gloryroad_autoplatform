@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from django.contrib import auth
 from .models import TestCaseInfo, ProjectInfo, CaseStepInfo, CaseExecuteResult, ExecuteRecord, ModuleInfo
@@ -56,16 +57,19 @@ def caseStepSearch(request):
 @login_required
 def case_manage(request):
     if request.method == "POST":
+        username = request.session.get('user', '')
+        print("username: %s" % username)
         case_id_list = request.POST.getlist('testcase')
         if case_id_list:
             print("case_id_list: ", case_id_list)
-            # 获取测试用例
-            runTestCase.delay(case_id_list)
-            # with ThreadPoolExecutor(3) as executor:
-            #     executor.map(runTestCase, case_id_list)
-
-            # runTestCase(case_id_list)
-
+            # 获取当前时间点时间戳，用于存储各个用例执行记录的执行id（相同）
+            execute_id = int(time.time())
+            print("execute_id: %s" % execute_id)
+            for caseId in case_id_list:
+                # 获取测试用例
+                runTestCase.delay(execute_id, caseId, username)
+                # with ThreadPoolExecutor(3) as executor:
+                #     executor.map(runTestCase, case_id_list)
             return HttpResponse("ok")
         else:
             print("no case_id_list")
@@ -91,8 +95,9 @@ def case_manage(request):
 def casestep_manage(request):
     username = request.session.get('user', '')
     caseid = request.GET.get('webcase.id', None)
+    print("caseid: %s" % caseid)
     testcase = TestCaseInfo.objects.get(id=caseid)
-    casestep_list = CaseStepInfo.objects.all().order_by('teststep')
+    casestep_list = CaseStepInfo.objects.filter(case_id=caseid).order_by('teststep')
     print("casestep_list: ", casestep_list)
     paginator = Paginator(casestep_list, 8) # 生成paginator对象，设置每页显示8条记录
     page = request.GET.get('page', 1) # 获取当前的页码数，默认为第一页
