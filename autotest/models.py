@@ -6,13 +6,13 @@ from django.contrib.auth.models import User
 class ProjectInfo(models.Model):
     id = models.AutoField(primary_key=True)
     project_name = models.CharField('项目名称', max_length=50, unique=True, null=False)
-    responsible_name = models.CharField('负责人', max_length=20, null=False)
+    responsible_name = models.CharField('项目负责人', max_length=20, null=False)
     test_user = models.CharField('测试人员', max_length=100, null=False)
     dev_user = models.CharField('开发人员', max_length=100, null=False)
     simple_desc = models.CharField('简要描述', max_length=100, null=True)
     create_time = models.DateTimeField('创建时间', auto_now_add=True)
     update_time = models.DateTimeField('更新时间', auto_now=True, null=True)
-    other_desc = models.CharField('其他信息', max_length=100, null=True)
+    other_desc = models.CharField('备注', max_length=100, null=True)
 
     def __str__(self):
         return self.project_name

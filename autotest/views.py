@@ -145,8 +145,7 @@ def suite_manage(request):
         else:
             print("no case_id_list")
             return HttpResponse("fail")
-    else:
-
+    elif request.method == 'GET':
         username = request.session.get('user', '')
         testsuite_data = TestSuiteInfo.objects.all()
         suite_list = []
@@ -154,6 +153,8 @@ def suite_manage(request):
             suite_dict = {}
             suite_dict['id'] = suite.id
             suite_dict['suite_name'] = suite.suite_name
+            suite_dict['belong_project'] = suite.belong_project.project_name
+            suite_dict['belong_module'] = suite.belong_module.module_name
             print("suite.include_cases: %s" % suite.include_cases)
             include_cases = eval(suite.include_cases) # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
             print("include_cases: %s" % include_cases)
@@ -165,7 +166,7 @@ def suite_manage(request):
                 include_cases_list.append(include_cases_dict)
             print("include_cases_list: %s" % include_cases_list)
 
-            suite_dict['include_cases'] = include_cases_list
+            suite_dict['include_cases'] = len(include_cases_list) # 暂时取列表的长度，include_cases_list保留
             suite_dict['create_time'] = suite.create_time
             suite_dict['update_time'] = suite.update_time
             suite_list.append(suite_dict)
@@ -182,7 +183,7 @@ def suite_manage(request):
         except EmptyPage:
             casestep_list = paginator.page(paginator.num_pages)  # 如果输入的页数不在系统的页数中，则显示最后一页
 
-        return render(request, "suite_manage.html", {"user": username, "testsuites": testsuite_data})
+        return render(request, "suite_manage.html", {"user": username, "testsuites": suite_list})
 
 
 
@@ -191,32 +192,12 @@ def case_result_level_one(request):
     return render(request, "case_result_level1.html")
 
 
-"""
-    execute_id = models.AutoField(primary_key=True)
-    1 case_id = models.CharField(max_length=100, null=False)
-    status = models.IntegerField(null=True, help_text="0：表示未执行，1：表示已执行")
-    1 execute_result = models.CharField(max_length=100, null=True)
-    create_time = models.DateTimeField('创建时间', auto_now_add=True)
-    1 exception_info= models.CharField(max_length=500, blank=True, null=True)
-    1 capture_screen = models.CharField(max_length=500, blank=True, null=True)
-    1 execute_start_time = models.CharField('执行开始时间', max_length=300, blank=True, null=True)
-    execute_end_time = models.CharField('执行结束时间', max_length=300, blank=True, null=True)
-
-     <td>{{ webcase.id }}</td>
-     单独<td>{{ webcase.belong_module.module_name }}</td>
-     单独<td>{{ webcase.name }}</td>
-     单独<td>{{ webcase.author }}</td>
-     单独<td>{{ webcase.create_time }}</td>
-     <td>{{ webcase.execute_time }}</td>
-     <td>{{ webcase.execute_result }}</td>
-     <td>{{ webcase.exception_info }}</td>
-     <td>{{ webcase.capture_screen }}</td>
-"""
-# 用例步骤
+# 用例结果
 @login_required
 def case_result_level_two(request):
     username = request.session.get('user', '')
     runStatus = request.GET.get("alreadyrun", '')
+    suiteId = request.GET.get("suiteid", '')
     # runStatus: 0: 待执行，1： 已执行
     if runStatus:
         print("runStatus: %s" % runStatus)
@@ -242,6 +223,48 @@ def case_result_level_two(request):
         print("case_list: %s" % case_list)
         case_account = len(case_list)
         return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
+    if suiteId: # 如果请求中含有suiteid参数
+        print("suiteId: %s" % suiteId)
+        suite_info = TestSuiteInfo.objects.filter(id=suiteId).first()
+        include_cases = eval(suite_info.include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+        print("include_cases: %s" % include_cases)
+        case_id_list = []
+        for case in include_cases:
+            case_id_list.append(case[0])
+        print("case_id_list: %s" % case_id_list)
+        execute_id_in_execute_record = max([record.execute_id for record in ExecuteRecord.objects.filter(case_id = case_id_list[0])])
+        print("execute_id_in_execute_record: %s" % execute_id_in_execute_record)
+        execute_record_data = ExecuteRecord.objects.filter(execute_id=execute_id_in_execute_record).all()
+        print("execute_record_data: %s" % execute_record_data)
+        case_list = []
+        success_num = 0
+        fail_num = 0
+        for record in execute_record_data:
+            case_dict = {}
+            case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
+            print("case_info: ", case_info)
+            case_dict["case_id"] = record.case_id
+            case_dict["execute_result"] = '' if not record.execute_result else record.execute_result
+            case_dict["exception_info"] = '' if  not record.exception_info else record.exception_info
+            case_dict["capture_screen"] = '' if not record.capture_screen else record.capture_screen
+            case_dict["execute_start_time"] = record.execute_start_time
+            case_dict["belong_module"] = case_info.belong_module.module_name
+            case_dict["name"] = case_info.name
+            case_dict["author"] = case_info.author
+            case_dict["create_time"] = case_info.create_time
+            if record.execute_result == "pass":
+                success_num += 1
+            else:
+                fail_num += 1
+            print("case_dict: %s" % case_dict)
+            case_list.append(case_dict)
+
+        print("case_list: %s" % case_list)
+        case_account = len(case_list)
+        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account, "successnumber": success_num, "failnumber": fail_num})
+
+
+
 
 # 用例步骤
 @login_required

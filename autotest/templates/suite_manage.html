@@ -127,7 +127,7 @@ function ischecked()
 <input type="checkbox" id="chElt" onclick="checkOrCancelAll();"/><span id="mySpan">全选</span> <br />
 <input name="submit" type="submit" onclick="return ischecked()" value="运行" style="position:absolute; top:0px; left:100px" />  <br />
 
-<th>选择</th><th>序号</th><th>名称</th><th>所属项目</th><th>包含用例</th><th>创建时间</th><th>更新时间</th><th>操作</th>
+<th>选择</th><th>序号</th><th>名称</th><th>所属项目</th><th>所属模块</th><th>包含用例</th><th>创建时间</th><th>更新时间</th><th>执行结果</th>
  </tr>
  </thead>
  <tbody>
@@ -136,17 +136,19 @@ function ischecked()
  <td><input class="file" type="checkbox" name="testsuite" value="{{ suite.id }}"/></td>
  <td>{{ suite.id }}</td>
  <td>{{ suite.suite_name }}</td>
- <td>{{ suite.belong_module.module_name }}</td>
+ <td>{{ suite.belong_project }}</td>
+ <td>{{ suite.belong_module }}</td>
  <td>
 {#     {% for case in suite.include_cases %}#}
 {#          <td>{{ case.case_id }}-{{ case.case_desc }}</td>#}
 {#     {% endfor %}#}
-     {{ suite.include_cases }}
+     {{ suite.include_cases }}个用例
 
  </td>
 
  <td>{{ suite.create_time|date:"Y-m-d H:i:s" }}</td>
  <td>{{ suite.update_time|date:"Y-m-d H:i:s" }}</td>
+ <td><a style="color: #0000cc;" href="{% url 'autotest:case_result_level_two' %}?suiteid={{ suite.id }}" target="_blank">执行结果</a></td>
  <td></td>
 
  </tr>

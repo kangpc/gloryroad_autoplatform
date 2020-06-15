@@ -117,6 +117,91 @@
 
 {# {% csrf_token %} #}
 
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="height:300px"></div>
+<!-- ECharts单文件引入 -->
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script type="text/javascript">
+    // 路径配置
+    require.config({
+        paths: {
+            echarts: 'http://echarts.baidu.com/build/dist'
+        }
+    });
+
+    // 使用
+    require(
+        [
+            'echarts',
+            'echarts/chart/pie' // pie是饼图，使用柱状图就加载bar模块，按需加载
+        ],
+        function (ec) {
+            // 基于准备好的dom，初始化echarts图表
+            var myChart = ec.init(document.getElementById('main'));
+
+            var option = {
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    legend: {
+                     orient: 'horizontal', // 'vertical'
+                        x: 'left', // 'center' | 'left' | {number},
+                        y: 'top', // 'center' | 'bottom' | {number}
+                        backgroundColor: '#eee',
+                        borderColor: 'rgba(178,34,34,0.8)',
+                        borderWidth: 4,
+                        padding: 10,    // [5, 10, 15, 20]
+                        itemGap: 20,
+                        textStyle: {color: 'red'},
+                        data: [
+                            '成功用例','失败用例'
+                        ]
+                     },
+                    calculable : true,
+                    series : [
+                        {
+                            name:'用例执行结果',
+                            type:'pie',
+                            radius : ['40%', '80%'],
+                            itemStyle : {
+                                normal : {
+                                    label : {
+                                        show : false
+                                    },
+                                    labelLine : {
+                                        show : false
+                                    }
+                                },
+                                emphasis : {
+
+                                    label : {
+                                        show : true,
+                                        position : 'center',
+                                        textStyle : {
+                                            fontSize : '20',
+                                            fontWeight : 'bold'
+                                        }
+                                    }
+                                }
+                            },
+                            data:[
+                                {value:{{ successnumber }}, name:'成功用例'},
+                                {value:{{ failnumber }}, name:'失败用例'},
+                            ]
+                        }
+                    ],
+                    color: ['#1fc223', '#c22d33', '#c23531', '#c23531']
+                };
+
+
+            // 为echarts对象加载数据
+            myChart.setOption(option);
+        }
+    );
+</script>
+
+
 
 
 <!-- 增加web测试用例-->
@@ -164,41 +249,41 @@
  </table>
  </div>
  </div>
-
-<!--统计和翻页功能-->
-<span style="position:absolute; left:800px; bottom:30px;">   {# 把翻页功能固定显示在右下角#}
-<div style="position:absolute; right:500px; bottom:25px; width:100px;">
-共:{{ caseaccounts }}条记录 {# 前端读取定义的变量#}
-</div>
-<div class="container">
-    <ul class="pagination" id="pager">
+{##}
+{#<!--统计和翻页功能-->#}
+{#<span style="position:absolute; left:800px; bottom:30px;">   {# 把翻页功能固定显示在右下角#}
+{#<div style="position:absolute; right:500px; bottom:25px; width:100px;">#}
+{#共:{{ caseaccounts }}条记录 {# 前端读取定义的变量#}
+{#</div>#}
+{#<div class="container">#}
+{#    <ul class="pagination" id="pager">#}
           {# 上一页链接开始#}
-        {% if cases.has_previous %}
+{#        {% if cases.has_previous %}#}
             {#  如果有上一页则正常显示上一页链接#}
-            <li class="previous"><a href="/case_manage/?page={{ cases.previous_page_number }}">上一页</a></li>    {#  上一页标签 #}
-        {% else %}
-            <li class="previous disabled"><a href="#">上一页</a></li> {# 如果当前不存在上一页则上一页的链接不可点击#}
-        {% endif %}
+{#            <li class="previous"><a href="/case_manage/?page={{ cases.previous_page_number }}">上一页</a></li>    {#  上一页标签 #}
+{#        {% else %}#}
+{#            <li class="previous disabled"><a href="#">上一页</a></li> {# 如果当前不存在上一页则上一页的链接不可点击#}
+{#        {% endif %}#}
         {# 上一页链接开始#}
-
-        {% for num in cases.paginator.page_range %}
-
-            {% if num == currentPage %}
-                <li class="item active"><a href="/case_manage/?page={{ num }}">{{ num }}</a></li> {#显示当页数链接#}
-            {% else %}
-                <li class="item"><a href="/case_manage/?page={{ num }}">{{ num }}</a></li>
-            {% endif %}
-        {% endfor %}
-
+{##}
+{#        {% for num in cases.paginator.page_range %}#}
+{##}
+{#            {% if num == currentPage %}#}
+{#                <li class="item active"><a href="/case_manage/?page={{ num }}">{{ num }}</a></li> {#显示当页数链接#}
+{#            {% else %}#}
+{#                <li class="item"><a href="/case_manage/?page={{ num }}">{{ num }}</a></li>#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{##}
         {# 下一页链接开始#}
-        {% if cases.has_next %} {#  如果有下一页则正常显示下一页链接#}
-            <li class="next"><a href="/case_manage/?page={{ cases.next_page_number }}">下一页</a></li>
-        {% else %}
-            <li class="next disabled"><a href="#">下一页</a></li>
-        {% endif %}
+{#        {% if cases.has_next %} {#  如果有下一页则正常显示下一页链接#}
+{#            <li class="next"><a href="/case_manage/?page={{ cases.next_page_number }}">下一页</a></li>#}
+{#        {% else %}#}
+{#            <li class="next disabled"><a href="#">下一页</a></li>#}
+{#        {% endif %}#}
         {# 下一页链接结束#}
-    </ul>
-</div>
+{#    </ul>#}
+{#</div>#}
 
     <!-- 弹出层 --->
     <div id="popLayer"></div>
