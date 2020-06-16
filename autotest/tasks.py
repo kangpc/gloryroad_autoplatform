@@ -55,7 +55,7 @@ def getBaiDu():
 
 @shared_task
 # 获取测试用例
-def runTestCase(execute_id, caseId, username):
+def runTestCase(execute_id, caseId, username, suiteId=None):
     try:
         # 存储用例执行记录表（executerecord）
         print("#################用例开始执行#################")
@@ -67,6 +67,10 @@ def runTestCase(execute_id, caseId, username):
         execute_record.execute_user = user # 执行记录关联用户
         # 存储executerecord表的execute_id，存储规则：不会重复的时间戳int(time.time())
         execute_record.execute_id = execute_id  # 当前所有执行记录的执行id是同一个
+
+        print("suiteId: %s" % suiteId)
+        if suiteId:
+            execute_record.suite_id = suiteId
         try:
             execute_record.save() # 一条数据保存一次
         except Exception as e:

@@ -126,19 +126,27 @@ def suite_manage(request):
             # 获取当前时间点时间戳，用于存储各个用例执行记录的执行id（相同）
             execute_id = int(time.time())
             print("execute_id: %s" % execute_id)
-            case_id_list = []
+
+            suite_id_case_id_dict = {} # {'1': [1,2,3,4], '2': [1,3,4]}
             for suite_id in suite_id_list:
+                case_id_list = []
                 suiteInfo = TestSuiteInfo.objects.filter(id=suite_id).first()
                 include_cases = suiteInfo.include_cases
                 print("include_cases: %s" % include_cases)
                 include_cases = eval(include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
                 print("include_cases: %s" % include_cases)
+                # 获取测试用例id列表
                 for case in include_cases:
-                    case_id_list.append(case[0])
+                    case_id_list.append(case[0]) # [1, 2]
                 print("case_id_list: %s" % case_id_list)
-            for caseId in case_id_list:
+                # 获取suiteid和用例列表的对应字典
+                suite_id_case_id_dict[suite_id] = case_id_list #  {'1': [1,2,3,4], '2': [1,3,4]}
+            print("suite_id_case_id_dict: %s" % suite_id_case_id_dict)
+            for suite_id, case_id_list in suite_id_case_id_dict.items(): # 遍历suiteid和用例列表关联字典，传入用例执行函数，在执行记录表里记录执行记录和suiteid的关系
+                print("case_id_list in for statement: %s" % case_id_list)
                 # 获取测试用例
-                runTestCase.delay(execute_id, caseId, username)
+                for case_id in case_id_list:
+                    runTestCase.delay(execute_id, case_id, username, suite_id)
                 # with ThreadPoolExecutor(3) as executor:
                 #     executor.map(runTestCase, case_id_list)
             return HttpResponse("ok")
@@ -261,7 +269,7 @@ def case_result_level_two(request):
 
         print("case_list: %s" % case_list)
         case_account = len(case_list)
-        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account, "successnumber": success_num, "failnumber": fail_num})
+        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account, "successnumber": success_num, "failnumber": fail_num, "suiteid": suiteId})
 
 
 

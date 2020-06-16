@@ -112,6 +112,7 @@ class CaseStepInfo(models.Model):
 class ExecuteRecord(models.Model):
     id = models.AutoField(primary_key=True)
     execute_id =  models.IntegerField(null=True, help_text="执行id，每次批量提交的用例的execute_id是一样的，用例收集报告信息")
+    suite_id =  models.IntegerField(null=True, blank=True, help_text="测试集id，通过提交suite执行时产生，否则为空，用于查找该用例集的历史结果")
     execute_user = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='执行人员', blank=True, null=True)
     case = models.ForeignKey(TestCaseInfo, on_delete=models.CASCADE, blank=True, null=True, verbose_name='用例信息') # 执行记录对应于用例信息，级联关系
     status = models.IntegerField(null=True, help_text="0：表示未执行，1：表示已执行")
