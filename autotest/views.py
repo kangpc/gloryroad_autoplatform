@@ -201,7 +201,7 @@ def case_result_level_two(request):
     # runStatus: 0: 待执行，1： 已执行
     if runStatus:
         print("runStatus: %s" % runStatus)
-        case_recored_list = ExecuteRecord.objects.filter(status = 1).order_by('create_time') if (str(runStatus) == '1') else ExecuteRecord.objects.filter(status=0)
+        case_recored_list = ExecuteRecord.objects.filter(status = 1).order_by('-create_time') if (str(runStatus) == '1') else ExecuteRecord.objects.filter(status=0)
         print("case_recored_list: ", case_recored_list)
         case_list = []
         for record in case_recored_list:

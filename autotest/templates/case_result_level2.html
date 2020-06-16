@@ -96,20 +96,20 @@
 
  </head>
  <body role="document">
- <!-- 导航栏-->
- <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
- <div class="container">
-
-&nbsp;&nbsp;&nbsp;&nbsp;
- <ul class="nav justify-content-center">
-
+<!-- 导航栏-->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+<div class="container">
+<ul class="nav justify-content-left"> &nbsp;
+</ul>
+<ul class="nav justify-content-center"> &nbsp;
 </ul>
 <ul class="nav justify-content-end" style="position:absolute; right:10px; bottom:0px; ">
+<li class="nav-link"><a style='color:white' href="/home/">Home</a></li>
 <li class="nav-link"><a style='color:white' href="#">{{user}}</a></li>
 <li class="nav-link"><a style='color:white' href="/logout/">退出</a></li>
 </ul>
- </div>
- </nav>
+</div>
+</nav>
 
 <!-- 搜索栏-->
 <div class="page-header" style="padding-top: 70px;">
@@ -118,7 +118,7 @@
 {# {% csrf_token %} #}
 
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-<div id="main" style="height:300px"></div>
+<div id="main" style="height:250px"></div>
 <!-- ECharts单文件引入 -->
 <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
 <script type="text/javascript">
@@ -145,17 +145,17 @@
                         formatter: "{a} <br/>{b} : {c} ({d}%)"
                     },
                     legend: {
-                     orient: 'horizontal', // 'vertical'
-                        x: 'left', // 'center' | 'left' | {number},
-                        y: 'top', // 'center' | 'bottom' | {number}
-                        backgroundColor: '#eee',
-                        borderColor: 'rgba(178,34,34,0.8)',
-                        borderWidth: 4,
+                     orient: 'horizontal', // 'vertical'/horizontal
+                        x: 'center', // 'center' | 'left' | {number},
+                        y: '230', // 'center' | 'bottom' | {number}
+                        {#backgroundColor: '#eee',#}
+                        {#borderColor: 'rgba(178,34,34,0.8)',#}
+                        {#borderWidth: 4,#}
                         padding: 10,    // [5, 10, 15, 20]
                         itemGap: 20,
                         textStyle: {color: 'red'},
                         data: [
-                            '成功用例','失败用例'
+                            '成功用例{{ successnumber }}','失败用例{{ failnumber }}'
                         ]
                      },
                     calculable : true,
@@ -163,7 +163,9 @@
                         {
                             name:'用例执行结果',
                             type:'pie',
-                            radius : ['40%', '80%'],
+                            center:['50%', '40%'],
+                            radius : ['40%', '70%'],
+                            {#selectedOffset: 20,#}
                             itemStyle : {
                                 normal : {
                                     label : {
@@ -186,8 +188,8 @@
                                 }
                             },
                             data:[
-                                {value:{{ successnumber }}, name:'成功用例'},
-                                {value:{{ failnumber }}, name:'失败用例'},
+                                {value:{{ successnumber }}, name:'成功用例{{ successnumber }}'},
+                                {value:{{ failnumber }}, name:'失败用例{{ failnumber }}'},
                             ]
                         }
                     ],
@@ -248,6 +250,13 @@
  </tbody>
  </table>
  </div>
+ <div class="col-md-12">
+ <table class="table table-striped">
+     <th><a style="color: #0000cc;" href="{% url 'autotest:case_result_detail' %}?caseid={{ webcase.case_id }}" target="_blank">历史记录</a></th>
+
+ </table>
+ </div>
+
  </div>
 {##}
 {#<!--统计和翻页功能-->#}
