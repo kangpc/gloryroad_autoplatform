@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from autotest.models import ProjectInfo, ModuleInfo, TestCaseInfo, CaseStepInfo
+from autotest.models import ProjectInfo, ModuleInfo, TestCaseInfo, CaseStepInfo, KeyWord
 
 admin.site.site_title = 'GloryroadPlatform'
 admin.site.site_header = 'GloryroadPlatform'
@@ -25,3 +25,6 @@ class CaseStepInfoAdmin(admin.ModelAdmin):
 class TestCaseInfoAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'belong_project', 'belong_module', 'author', 'create_time', 'update_time']
 
+@admin.register(KeyWord) # 把关键字信息注册到Django admin后台并显示
+class TestCaseInfoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'keyword_name', 'params', 'kw_description', 'create_time', 'update_time']

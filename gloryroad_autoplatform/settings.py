@@ -123,7 +123,7 @@ USE_I18N = True
 
 USE_L10N = False # 初始为True
 
-USE_TZ = True
+USE_TZ = True # 暂时不适用时区
 
 
 # Static files (CSS, JavaScript, Images)
@@ -137,11 +137,11 @@ CELERY_TASK_SERIALIZER = 'json'
 # 设置存储Celery任务结果的数据库
 CELERY_RESULT_BACKEND = 'django-db'#使用django orm 作为结果存储
 
-
-# 设置定时任务相关配置
+CELERY_TIMEZONE = 'Asia/Shanghai'
 CELERY_ENABLE_UTC = False
+# 设置定时任务相关配置
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
+#DJANGO_CELERY_BEAT_TZ_AWARE = False
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -151,7 +151,6 @@ LOGIN_URL = '/login/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-USE_L10N = False
 
 DATETIME_FORMAT = 'Y-m-d H:i:s'
 

@@ -206,6 +206,7 @@ def case_result_level_two(request):
     username = request.session.get('user', '')
     runStatus = request.GET.get("alreadyrun", '')
     suiteId = request.GET.get("suiteid", '')
+    historySuiteId = request.GET.get("historysuiteid", '')
     # runStatus: 0: 待执行，1： 已执行
     if runStatus:
         print("runStatus: %s" % runStatus)
@@ -240,14 +241,58 @@ def case_result_level_two(request):
         for case in include_cases:
             case_id_list.append(case[0])
         print("case_id_list: %s" % case_id_list)
-        execute_id_in_execute_record = max([record.execute_id for record in ExecuteRecord.objects.filter(case_id = case_id_list[0])])
+        # 通过max获取executerecord表中用例id对应的最大的execute_id，即获取到最新的执行记录
+        execute_id_in_execute_record = max([record.execute_id for record in ExecuteRecord.objects.filter(case_id = case_id_list[0])]) # 因为case_id_list中所有的用例本次执行的execute_id是一样的，所以用一个case来获取execute_id就可以了
         print("execute_id_in_execute_record: %s" % execute_id_in_execute_record)
+
+        # 用获取到的execute_id反过来查找对应的所有的执行记录，每一条记录即是一条case的执行记录，结果即查到本次提交的测试集中所有用例的最新的执行结果记录了
         execute_record_data = ExecuteRecord.objects.filter(execute_id=execute_id_in_execute_record).all()
         print("execute_record_data: %s" % execute_record_data)
         case_list = []
-        success_num = 0
-        fail_num = 0
-        for record in execute_record_data:
+        success_num = 0 # 获取成功用例数，用于填充echart图
+        fail_num = 0 # 存储失败用例数，用于填充echart图
+        for record in execute_record_data: # 组合所有执行记录的信息，填充到模板中
+            case_dict = {}
+            case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
+            print("case_info: ", case_info)
+            case_dict["case_id"] = record.case_id
+            case_dict["execute_result"] = '' if not record.execute_result else record.execute_result
+            case_dict["exception_info"] = '' if  not record.exception_info else record.exception_info
+            case_dict["capture_screen"] = '' if not record.capture_screen else record.capture_screen
+            case_dict["execute_start_time"] = record.execute_start_time
+            case_dict["belong_module"] = case_info.belong_module.module_name
+            case_dict["name"] = case_info.name
+            case_dict["author"] = case_info.author
+            case_dict["create_time"] = case_info.create_time
+            if record.execute_result == "pass":
+                success_num += 1
+            else:
+                fail_num += 1
+            print("case_dict: %s" % case_dict)
+            case_list.append(case_dict)
+
+        print("case_list: %s" % case_list)
+        case_account = len(case_list)
+        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account, "successnumber": success_num, "failnumber": fail_num, "suiteid": suiteId})
+
+    if historySuiteId: # 如果请求中含有historySuiteId参数,则获取该suiteid对应的所有的用例结果
+        print("historySuiteId: %s" % historySuiteId)
+        # 获取到historySuiteId对应的executerecord表中的suite_id为historySuiteId的所有数据，获取用例每一条数据的exetuterrecord_id和case_id，传给result_level_two页面，然后再result_level_two页面把exetuterrecord_id传给执行详情获取步骤信息
+        execute_record_data = ExecuteRecord.objects.filter(suite_id = historySuiteId).all()
+        print("execute_record_data: %s" % execute_record_data)
+        # execute_record_list = [{"execute_record_id": 1, "case_id": 1}, {"execute_record_id": 2, "case_id": 2}]
+        execute_record_list = []
+        for record_data in execute_record_data:
+            record_dict = {}
+            record_dict["execute_record_id"] = record_data.id
+            record_dict["case_id"] = record_data.case_id
+            execute_record_list.append(record_dict)
+        print("execute_record_list: %s" % execute_record_list)
+
+        case_list = []
+        success_num = 0 # 获取成功用例数，用于填充echart图
+        fail_num = 0 # 存储失败用例数，用于填充echart图
+        for record in execute_record_data: # 组合所有执行记录的信息，填充到模板中
             case_dict = {}
             case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
             print("case_info: ", case_info)
