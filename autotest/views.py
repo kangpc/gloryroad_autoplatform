@@ -213,11 +213,14 @@ def case_result_level_two(request):
         case_recored_list = ExecuteRecord.objects.filter(status = 1).order_by('-create_time') if (str(runStatus) == '1') else ExecuteRecord.objects.filter(status=0)
         print("case_recored_list: ", case_recored_list)
         case_list = []
+        success_num = 0  # 获取成功用例数，用于填充echart图
+        fail_num = 0  # 存储失败用例数，用于填充echart图
         for record in case_recored_list:
             case_dict = {}
             case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
             print("case_info: ,", case_info)
             case_dict["case_id"] = record.case_id
+            case_dict["execute_record_id"] = record.id
             case_dict["execute_result"] = '' if not record.execute_result else record.execute_result
             case_dict["exception_info"] = '' if  not record.exception_info else record.exception_info
             case_dict["capture_screen"] = '' if not record.capture_screen else record.capture_screen
@@ -227,11 +230,18 @@ def case_result_level_two(request):
             case_dict["author"] = case_info.author
             case_dict["create_time"] = case_info.create_time
             print("case_dict: %s" % case_dict)
+            if record.execute_result == "pass":
+                success_num += 1
+            else:
+                fail_num += 1
+            print("case_dict: %s" % case_dict)
+            case_list.append(case_dict)
             case_list.append(case_dict)
 
         print("case_list: %s" % case_list)
         case_account = len(case_list)
-        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account})
+        return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account, "successnumber": success_num, "failnumber": fail_num})
+
     if suiteId: # 如果请求中含有suiteid参数
         print("suiteId: %s" % suiteId)
         suite_info = TestSuiteInfo.objects.filter(id=suiteId).first()
@@ -256,6 +266,7 @@ def case_result_level_two(request):
             case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
             print("case_info: ", case_info)
             case_dict["case_id"] = record.case_id
+            case_dict["execute_record_id"] = record.id
             case_dict["execute_result"] = '' if not record.execute_result else record.execute_result
             case_dict["exception_info"] = '' if  not record.exception_info else record.exception_info
             case_dict["capture_screen"] = '' if not record.capture_screen else record.capture_screen
@@ -286,6 +297,7 @@ def case_result_level_two(request):
             record_dict = {}
             record_dict["execute_record_id"] = record_data.id
             record_dict["case_id"] = record_data.case_id
+            record_dict["execute_record_id"] = record_data.id
             execute_record_list.append(record_dict)
         print("execute_record_list: %s" % execute_record_list)
 
@@ -297,6 +309,7 @@ def case_result_level_two(request):
             case_info = TestCaseInfo.objects.filter(id = record.case_id).first()
             print("case_info: ", case_info)
             case_dict["case_id"] = record.case_id
+            case_dict["execute_record_id"] = record.id
             case_dict["execute_result"] = '' if not record.execute_result else record.execute_result
             case_dict["exception_info"] = '' if  not record.exception_info else record.exception_info
             case_dict["capture_screen"] = '' if not record.capture_screen else record.capture_screen
@@ -324,27 +337,46 @@ def case_result_level_two(request):
 def case_result_detail(request):
     username = request.session.get('user', '')
     caseId = request.GET.get("caseid", '')
+    execute_record_id =  request.GET.get("execute_record_id", "")
+
     if caseId:
         print("caseId: %s" % caseId)
-        # 先找到executerecord表中该用例id的最新执行主键id，然后通过该主键id到caseexeuteresult中找execute_record_id为该主键id的记录
-        case_record_data = ExecuteRecord.objects.filter(case_id = caseId)
-        print("case_record_data: %s" % case_record_data)
-        case_record_id = max([record.id for record in ExecuteRecord.objects.filter(case_id = caseId)])
-        print("case_record_id: %s" % case_record_id)
-        case_execute_result_list = CaseExecuteResult.objects.filter(execute_record_id = case_record_id).order_by('step_id')
-        print("case_execute_result_list: %s" % case_execute_result_list)
-        caseStepResultList = []
-        for stepResult in case_execute_result_list:
-            step_result_dict = {}
-            step_result_dict["step_id"] = stepResult.step_id
-            step_result_dict["step_desc"] = stepResult.step_desc
-            step_result_dict["step_result"] = stepResult.result
-            step_result_dict["create_time"] = stepResult.create_time
-            step_result_dict["exception_info"] = '' if not stepResult.exception_info else stepResult.exception_info
-            step_result_dict["capture_screen"] = '' if not stepResult.capture_screen else stepResult.capture_screen
+        if execute_record_id: # 如果有execute_id，直接取caseexecuteresult中改execute_id的数据作为执行详情步骤信息
+            print("execute_record_id: %s" % execute_record_id)
+            case_execute_result_list = CaseExecuteResult.objects.filter(execute_record_id=execute_record_id).order_by('step_id')
+            print("case_execute_result_list: %s" % case_execute_result_list)
+            caseStepResultList = []
+            for stepResult in case_execute_result_list:
+                step_result_dict = {}
+                step_result_dict["step_id"] = stepResult.step_id
+                step_result_dict["step_desc"] = stepResult.step_desc
+                step_result_dict["step_result"] = stepResult.result
+                step_result_dict["create_time"] = stepResult.create_time
+                step_result_dict["exception_info"] = '' if not stepResult.exception_info else stepResult.exception_info
+                step_result_dict["capture_screen"] = '' if not stepResult.capture_screen else stepResult.capture_screen
 
-            print("step_result_dict: %s" % step_result_dict)
-            caseStepResultList.append(step_result_dict)
+                print("step_result_dict: %s" % step_result_dict)
+                caseStepResultList.append(step_result_dict)
+        else: # 如果没有execute_record_id，则用case_id找最新的执行记录
+            # 先找到executerecord表中该用例id的最新执行主键id，然后通过该主键id到caseexeuteresult中找execute_record_id为该主键id的记录
+            case_record_data = ExecuteRecord.objects.filter(case_id = caseId)
+            print("case_record_data: %s" % case_record_data)
+            case_record_id = max([record.id for record in ExecuteRecord.objects.filter(case_id = caseId)])
+            print("case_record_id: %s" % case_record_id)
+            case_execute_result_list = CaseExecuteResult.objects.filter(execute_record_id = case_record_id).order_by('step_id')
+            print("case_execute_result_list: %s" % case_execute_result_list)
+            caseStepResultList = []
+            for stepResult in case_execute_result_list:
+                step_result_dict = {}
+                step_result_dict["step_id"] = stepResult.step_id
+                step_result_dict["step_desc"] = stepResult.step_desc
+                step_result_dict["step_result"] = stepResult.result
+                step_result_dict["create_time"] = stepResult.create_time
+                step_result_dict["exception_info"] = '' if not stepResult.exception_info else stepResult.exception_info
+                step_result_dict["capture_screen"] = '' if not stepResult.capture_screen else stepResult.capture_screen
+
+                print("step_result_dict: %s" % step_result_dict)
+                caseStepResultList.append(step_result_dict)
 
         print("caseStepResultList: %s" % caseStepResultList)
         case_account = len(caseStepResultList)

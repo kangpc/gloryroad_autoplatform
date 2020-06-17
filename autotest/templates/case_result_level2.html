@@ -243,7 +243,7 @@
  <td>{{ webcase.create_time|date:"Y-m-d H:i:s" }}</td>
  <td>{{ webcase.execute_start_time }}</td>
  <td>{{ webcase.execute_result }}</td>
- <td><a style="color: #0000cc;" href="{% url 'autotest:case_result_detail' %}?caseid={{ webcase.case_id }}" target="_blank">执行详情</a></td>
+ <td><a style="color: #0000cc;" href="{% url 'autotest:case_result_detail' %}?caseid={{ webcase.case_id }}&execute_record_id={{ webcase.execute_record_id }}" target="_blank">执行详情</a></td>
  </tr>
  {% endfor %}
 
