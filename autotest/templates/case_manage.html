@@ -140,8 +140,8 @@ function ischecked()
  <td>{{ webcase.name }}</td>
  <td>{{ webcase.author }}</td>
  <td>{{ webcase.create_time }}</td>
-<td><a href="{% url "autotest:casestep_manage" %}?webcase.id={{ webcase.id  }} "><img src="/static/admin/img/icon-yes.svg"/></a></td>
-<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Webcase" href="../admin/webtest/webcase/{{ webcase.id  }}/change/?_to_field=id&_popup=1"><img src="/static/admin/img/icon-changelink.svg"/></a></td>
+<td><a href="{% url "autotest:casestep_manage" %}?webcase.id={{ webcase.id  }} ">步骤信息</a></td>
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Webcase" href="../admin/autotest/testcaseinfo/{{ webcase.id  }}/change/?_to_field=id&_popup=1">编辑</a></td>
  </tr>
  {% endfor %}
 

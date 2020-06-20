@@ -50,13 +50,13 @@
 
 <tr>
 
-<td><a style='color:light blue; target-new: tab;'  target="_blank" class="related-widget-wrapper-link add-related" id="add_id_Product" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=1" >已执行用例</a></td>
-
+{#<td><a style='color:light blue; target-new: tab;'  target="_blank" class="related-widget-wrapper-link add-related" id="add_id_Product" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=1" >已执行用例</a></td>#}
+ <td><a style="color: #0000cc;" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=1" target="_blank">已执行用例</a></td>
 </tr>
 <tr>
 
-<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Product" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=0">未执行用例</a></td>
-
+{#<td><a style="color: #0000cc;" class="related-widget-wrapper-link add-related" id="add_id_Product" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=0">未执行用例</a></td>#}
+ <td><a style="color: #0000cc;" href="{% url 'autotest:case_result_level_two' %}?alreadyrun=0" target="_blank">未执行用例</a></td>
 </tr>
 
 </tbody>
@@ -64,40 +64,6 @@
 </div>
 </div>
 
-<!--统计和翻页功能-->
-<span style="position:absolute; left:600px; bottom:30px;">   {# 把翻页功能固定显示在右下角#}
-<div style="position:absolute; right:950px; bottom:25px; width:100px;">
-{# 共:{{ productcounts }}条记录 {# 前端读取定义的变量#} #}
-</div>
-<div class="container" >
-
-    <ul class="pagination" id="pager">
-          {# 上一页链接开始#}
-        {% if products.has_previous %}
-            {#  如果有上一页则正常显示上一页链接#}
-            <li class="previous"><a href="/project_manage/?page={{ products.previous_page_number }}">上一页</a></li>    {#  上一页标签 #}
-        {% else %}
-            <li class="previous disabled"><a href="#">上一页</a></li> {# 如果当前不存在上一页则上一页的链接不可点击#}
-        {% endif %}
-        {# 上一页链接开始#}
-
-        {% for num in products.paginator.page_range %}
-
-            {% if num == currentPage %}
-                <li class="item active"><a href="/project_manage/?page={{ num }}">{{ num }}</a></li> {#显示当页数链接#}
-            {% else %}
-                <li class="item"><a href="/project_manage/?page={{ num }}">{{ num }}</a></li>
-            {% endif %}
-        {% endfor %}
-
-        {# 下一页链接开始#}
-        {% if products.has_next %} {#  如果有下一页则正常显示下一页链接#}
-            <li class="next"><a href="/project_manage/?page={{ products.next_page_number }}">下一页</a></li>
-        {% else %}
-            <li class="next disabled"><a href="#">下一页</a></li>
-        {% endif %}
-        {# 下一页链接结束#}
-    </ul>
 
 </div>
 </body>

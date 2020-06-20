@@ -242,6 +242,18 @@ def case_result_level_two(request):
 
         print("case_list: %s" % case_list)
         case_account = len(case_list)
+
+        #分页：
+        paginator = Paginator(case_list, 8) # 生成Paginator对象，设置每页显示8条记录
+        page = request.GET.get('page', 1) # 获取当前的页码数，默认为第一页
+        currentPage = int(page) # 把获取的当前页数转成整数类型
+        try:
+            case_list = paginator.page(currentPage) # 获取当前页数的记录列表
+        except PageNotAnInteger:
+            case_list = paginator.page(1) # 如果输入的页数不是整数，则显示第一页内容
+        except EmptyPage:
+            case_list = paginator.page(paginator.num_pages) # 如果输入的页数不在系统的页数中，则显示最后一页
+
         return render(request, "case_result_level2.html", {'user': username, "cases": case_list, "caseaccounts": case_account, "successnumber": success_num, "failnumber": fail_num})
 
     if suiteId: # 如果请求中含有suiteid参数
