@@ -17,6 +17,8 @@ urlpatterns = [
     path('case_result_level_one/', case_result_level_one, name='case_result_level_one'),
     path('case_result_level_two/', case_result_level_two, name='case_result_level_two'),
     path('case_result_detail/', case_result_detail, name='case_result_detail'),
+    path('base/', base, name='base'),
+    path('test/', test, name='test'),
 
     # path('exception_info/', exception_info, name='exception_info'), # 暂时不用
     path('autotest_report/', autotest_report, name='autotest_report'),

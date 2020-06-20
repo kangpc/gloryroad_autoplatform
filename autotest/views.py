@@ -131,13 +131,14 @@ def suite_manage(request):
             for suite_id in suite_id_list:
                 case_id_list = []
                 suiteInfo = TestSuiteInfo.objects.filter(id=suite_id).first()
-                include_cases = suiteInfo.include_cases
+                # include_cases = suiteInfo.include_cases
+                include_cases = suiteInfo.cases.all()
                 print("include_cases: %s" % include_cases)
-                include_cases = eval(include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
-                print("include_cases: %s" % include_cases)
+                # include_cases = eval(include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+                # print("include_cases: %s" % include_cases)
                 # 获取测试用例id列表
                 for case in include_cases:
-                    case_id_list.append(case[0]) # [1, 2]
+                    case_id_list.append(case.id) # [1, 2]
                 print("case_id_list: %s" % case_id_list)
                 # 获取suiteid和用例列表的对应字典
                 suite_id_case_id_dict[suite_id] = case_id_list #  {'1': [1,2,3,4], '2': [1,3,4]}
@@ -163,14 +164,15 @@ def suite_manage(request):
             suite_dict['suite_name'] = suite.suite_name
             suite_dict['belong_project'] = suite.belong_project.project_name
             suite_dict['belong_module'] = suite.belong_module.module_name
-            print("suite.include_cases: %s" % suite.include_cases)
-            include_cases = eval(suite.include_cases) # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+            print("suite.cases.all(): %s" % suite.cases.all())
+            # include_cases = eval(suite.include_cases) # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+            include_cases = suite.cases.all() # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
             print("include_cases: %s" % include_cases)
             include_cases_list = []
             for case in include_cases:
                 include_cases_dict = {}
-                include_cases_dict['case_id'] =  case[0]
-                include_cases_dict['case_desc'] =  case[1]
+                include_cases_dict['case_id'] =  case.id
+                include_cases_dict['case_desc'] =  case.name
                 include_cases_list.append(include_cases_dict)
             print("include_cases_list: %s" % include_cases_list)
 
@@ -245,11 +247,12 @@ def case_result_level_two(request):
     if suiteId: # 如果请求中含有suiteid参数
         print("suiteId: %s" % suiteId)
         suite_info = TestSuiteInfo.objects.filter(id=suiteId).first()
-        include_cases = eval(suite_info.include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+        # include_cases = eval(suite_info.include_cases)  # [['1', '登录12306邮箱'], ['2', '登录12306邮箱用例1']]
+        include_cases = suite_info.cases.all()
         print("include_cases: %s" % include_cases)
         case_id_list = []
         for case in include_cases:
-            case_id_list.append(case[0])
+            case_id_list.append(case.id)
         print("case_id_list: %s" % case_id_list)
         # 通过max获取executerecord表中用例id对应的最大的execute_id，即获取到最新的执行记录
         execute_id_in_execute_record = max([record.execute_id for record in ExecuteRecord.objects.filter(case_id = case_id_list[0])]) # 因为case_id_list中所有的用例本次执行的execute_id是一样的，所以用一个case来获取execute_id就可以了
@@ -418,6 +421,12 @@ def login(request):
 
 def home(request):
     return render(request, 'home.html')
+
+def base(request):
+    return render(request, 'base.html')
+
+def test(request):
+    return render(request, 'atest.html')
 
 def logout(request):
     auth.logout(request)

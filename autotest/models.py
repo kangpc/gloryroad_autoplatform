@@ -60,12 +60,14 @@ class TestCaseInfo(models.Model):
 class TestSuiteInfo(models.Model):
     id = models.AutoField(primary_key=True)
     suite_name = models.CharField('测试集名称', max_length=200, null=False)
-    include_cases = models.CharField('包含用例id列表', max_length=200, null=False)
+    # include_cases = models.CharField('包含用例列表', max_length=500, null=False,default=None)
+    # include_cases = models.ForeignKey(TestCaseInfo, on_delete=models.SET_NULL, verbose_name='关联用例',blank=True, null=True)
     belong_project = models.ForeignKey(ProjectInfo, on_delete=models.SET_NULL, verbose_name='所属项目',blank=True, null=True)
     belong_module = models.ForeignKey(ModuleInfo, on_delete=models.CASCADE, verbose_name='所属模块')
     author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='编写人员',blank=True, null=True)
     create_time = models.DateTimeField('创建时间', auto_now_add=True)
     update_time = models.DateTimeField('更新时间', auto_now=True, null=True)
+    cases = models.ManyToManyField(TestCaseInfo, verbose_name="包含用例")
 
     def __str__(self):
         return self.suite_name
