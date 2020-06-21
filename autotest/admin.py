@@ -7,13 +7,12 @@ admin.site.site_title = 'GloryroadPlatform'
 admin.site.site_header = 'GloryroadPlatform'
 
 @admin.register(ProjectInfo) # 把项目信息注册到Django admin后台并显示
-class SetAdmin(admin.ModelAdmin):
+class ProjectAdmin(admin.ModelAdmin):
     list_display = ['project_name', 'responsible_name', 'test_user', 'dev_user', 'simple_desc', 'other_desc']
-
 
 @admin.register(ModuleInfo) # 把模块管理注册到Django admin后台并显示
 class ModelAdmin(admin.ModelAdmin):
-    list_display = ['module_name', 'belong_project', 'test_user', 'test_user', 'simple_desc', 'other_desc']
+    list_display = ['module_name', 'belong_project', 'test_user', 'simple_desc', 'other_desc']
 
 
 @admin.register(CaseStepInfo) # 把步骤信息注册到Django admin后台并显示

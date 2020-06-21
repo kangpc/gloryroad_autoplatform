@@ -4,8 +4,7 @@ from .views import *
 
 
 urlpatterns = [
-    # 搜索引擎
-    # path('', test, name='autotest'),
+
     path('login/', login, name='login'),
     path('home/', home, name='home'),
     path('logout/', logout, name='logout'),
@@ -19,15 +18,11 @@ urlpatterns = [
     path('case_result_detail/', case_result_detail, name='case_result_detail'),
     path('base/', base, name='base'),
     path('test/', test, name='test'),
-
-    # path('exception_info/', exception_info, name='exception_info'), # 暂时不用
+    # 目前先不用
     path('autotest_report/', autotest_report, name='autotest_report'),
     path('project_level_report/', project_level_report, name='project_level_report'),
     path('case_level_report/', case_level_report, name='case_level_report'),
     path('casesearch/', caseSearch, name='caseSearch'),
     path('stepsearch/', caseStepSearch, name='caseStepSearch'),
-    # path('submit/', caseSubmit, name='caseSubmit'),
-    # path('set_manage/', setviews.set_manage, name='set_manage'),
-    # path('user/', setviews.set_user, name='set_user'),
-    # path('caselist/', caseList, name='caseList'),
+
 ]

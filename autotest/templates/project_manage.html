@@ -26,37 +26,16 @@
 <ul class="nav justify-content-center"> &nbsp;
 </ul>
 <ul class="nav justify-content-end" style="position:absolute; right:10px; bottom:0px; ">
+<li class="nav-link"><a style='color:white' href="/home/">Home</a></li>
 <li class="nav-link"><a style='color:white' href="#">{{user}}</a></li>
 <li class="nav-link"><a style='color:white' href="/logout/">退出</a></li>
 </ul>
 </div>
 </nav>
-<!-- 搜索栏-->
-<div class="page-header" style="padding-top: 70px;">
-<form class="navbar-form" method="get" action="/productsearch/">
 
-{% csrf_token %}
-<input type="search" name="productname" placeholder="名称" required>
-
-<button type="submit">搜索</button>
-
-<!-- 增加产品-->
-<div style="float:right;width:65%">
-
-<select name="Product" id="id_Product">
-<option value="" selected>----项目名称----</option>
-</select>
-<a class="related-widget-wrapper-link change-related" id="change_id_Product" data-href-template="/admin/product/product/__fk__/change/?_to_field=id&amp;_popup=1" title="更改选中的产品">
-<img src="/static/admin/img/icon-changelink.svg" alt="修改"/>
-</a>
-<a class="related-widget-wrapper-link add-related" id="add_id_Product" href="/admin/product/product/add/?_to_field=id&amp;_popup=1" title="增加另一个 产品">
-<img src="/static/admin/img/icon-addlink.svg" alt="增加"/>增加
-</a>
-</form>
-</div>
 
 <!-- 产品列表-->
-<div class="row" style="padding-top: 20px;">
+<div class="row" style="padding-top: 30px;">
 <div class="col-md-12">
 <table class="table table-striped">
 <thead>
