@@ -238,7 +238,6 @@ def case_result_level_two(request):
                 fail_num += 1
             print("case_dict: %s" % case_dict)
             case_list.append(case_dict)
-            case_list.append(case_dict)
 
         print("case_list: %s" % case_list)
         case_account = len(case_list)

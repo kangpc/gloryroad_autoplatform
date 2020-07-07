@@ -40,11 +40,18 @@ class ModuleInfo(models.Model):
         verbose_name_plural = '模块信息表'
 
 
+# 0627新加
+from smart_selects.db_fields import GroupedForeignKey
+# class Location(models.Model):
+#     continent = models.ForeignKey(Continent)
+#     country = GroupedForeignKey(Country, "continent")
+
 class TestCaseInfo(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField('用例名称', max_length=50, null=False)
     belong_project = models.ForeignKey(ProjectInfo, on_delete=models.SET_NULL, verbose_name='所属项目',blank=True, null=True)
-    belong_module = models.ForeignKey(ModuleInfo, on_delete=models.CASCADE, verbose_name='所属模块')
+    belong_module = GroupedForeignKey(ModuleInfo, "belong_project", on_delete=models.CASCADE, verbose_name='所属模块')
+    # belong_module = models.ForeignKey(ModuleInfo, on_delete=models.CASCADE, verbose_name='所属模块')
     author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='编写人员',blank=True, null=True)
     create_time = models.DateTimeField('创建时间', auto_now_add=True)
     update_time = models.DateTimeField('更新时间', auto_now=True, null=True)
@@ -55,6 +62,23 @@ class TestCaseInfo(models.Model):
     class Meta:
         verbose_name = '用例表'
         verbose_name_plural = '用例表'
+
+
+# class TestCaseInfo(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     name = models.CharField('用例名称', max_length=50, null=False)
+#     belong_project = models.ForeignKey(ProjectInfo, on_delete=models.SET_NULL, verbose_name='所属项目',blank=True, null=True)
+#     belong_module = models.ForeignKey(ModuleInfo, on_delete=models.CASCADE, verbose_name='所属模块')
+#     author = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='编写人员',blank=True, null=True)
+#     create_time = models.DateTimeField('创建时间', auto_now_add=True)
+#     update_time = models.DateTimeField('更新时间', auto_now=True, null=True)
+#
+#     def __str__(self):
+#         return self.name
+#
+#     class Meta:
+#         verbose_name = '用例表'
+#         verbose_name_plural = '用例表'
 
 
 class TestSuiteInfo(models.Model):
